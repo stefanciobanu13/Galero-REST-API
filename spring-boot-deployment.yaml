@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: football-app
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: football-app
+data:
+  application.yml: |
+    spring:
+      application:
+        name: football-competition-api
+      jpa:
+        hibernate:
+          ddl-auto: validate
+        show-sql: false
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.MySQLDialect
+            format_sql: true
+      datasource:
+        url: jdbc:mysql://mysql-service.football-db.svc.cluster.local:3306/football_competition?useSSL=false&serverTimezone=UTC
+        username: football_user
+        password: football_password
+        driver-class-name: com.mysql.cj.jdbc.Driver
+
+    server:
+      port: 8080
+      servlet:
+        context-path: /api/v1
+
+    logging:
+      level:
+        root: INFO
+        com.galero: DEBUG
+        org.hibernate.SQL: DEBUG
+
+    springdoc:
+      api-docs:
+        path: /docs
+      swagger-ui:
+        path: /swagger-ui.html
+        enabled: true
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: football-api
+  namespace: football-app
+  labels:
+    app: football-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: football-api
+  template:
+    metadata:
+      labels:
+        app: football-api
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mysql-service.football-db.svc.cluster.local 3306; do echo waiting for MySQL; sleep 2; done']
+      containers:
+      - name: football-api
+        image: football-api:1.0.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: SPRING_CONFIG_LOCATION
+          value: file:/etc/config/application.yml
+        volumeMounts:
+        - name: app-config
+          mountPath: /etc/config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/swagger-ui.html
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/swagger-ui.html
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+      volumes:
+      - name: app-config
+        configMap:
+          name: app-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: football-api-service
+  namespace: football-app
+  labels:
+    app: football-api
+spec:
+  selector:
+    app: football-api
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: football-api-service-nodeport
+  namespace: football-app
+  labels:
+    app: football-api
+spec:
+  selector:
+    app: football-api
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30080
+    protocol: TCP
+    name: http
+  type: NodePort
