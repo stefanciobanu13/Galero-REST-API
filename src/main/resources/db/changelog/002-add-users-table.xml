@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="002-create-users-table" author="system">
+        <createTable tableName="users">
+            <column name="user_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="google_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uc_users_google_id"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uc_users_email"/>
+            </column>
+            <column name="first_name" type="VARCHAR(50)"/>
+            <column name="last_name" type="VARCHAR(50)"/>
+            <column name="profile_picture_url" type="VARCHAR(500)"/>
+            <column name="player_id" type="INT"/>
+            <column name="role" type="ENUM('admin', 'user')" defaultValue="user">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="users"
+                baseColumnNames="player_id"
+                referencedTableName="players"
+                referencedColumnNames="player_id"
+                constraintName="fk_users_players"
+                onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

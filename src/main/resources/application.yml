@@ -13,6 +13,9 @@ spring:
     username: root
     password: hbstudent
     driver-class-name: com.mysql.cj.jdbc.Driver
+  liquibase:
+    change-log: classpath:db/changelog.xml
+    enabled: true
 
 server:
   port: 8080
@@ -24,6 +27,7 @@ logging:
     root: INFO
     com.galero: DEBUG
     org.hibernate.SQL: DEBUG
+    liquibase: INFO
 
 springdoc:
   api-docs:

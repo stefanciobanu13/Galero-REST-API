@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="001-create-editions-table" author="system">
+        <createTable tableName="editions">
+            <column name="edition_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="edition_number" type="INT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-players-table" author="system">
+        <createTable tableName="players">
+            <column name="player_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="grade" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint columnNames="first_name,last_name" tableName="players" constraintName="unique_player_name"/>
+    </changeSet>
+
+    <changeSet id="001-create-teams-table" author="system">
+        <createTable tableName="teams">
+            <column name="team_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="edition_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team_color" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="teams"
+                baseColumnNames="edition_id"
+                referencedTableName="editions"
+                referencedColumnNames="edition_id"
+                constraintName="fk_teams_editions"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-team-players-table" author="system">
+        <createTable tableName="team_players">
+            <column name="team_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="team_players" columnNames="team_id,player_id" constraintName="pk_team_players"/>
+        <addForeignKeyConstraint
+                baseTableName="team_players"
+                baseColumnNames="team_id"
+                referencedTableName="teams"
+                referencedColumnNames="team_id"
+                constraintName="fk_team_players_teams"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="team_players"
+                baseColumnNames="player_id"
+                referencedTableName="players"
+                referencedColumnNames="player_id"
+                constraintName="fk_team_players_players"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-matches-table" author="system">
+        <createTable tableName="matches">
+            <column name="match_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="edition_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="match_type" type="ENUM('group', 'small_final', 'big_final')" defaultValue="group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stage" type="VARCHAR(20)"/>
+            <column name="team1_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team2_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team1_score" type="INT"/>
+            <column name="team2_score" type="INT"/>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="matches"
+                baseColumnNames="edition_id"
+                referencedTableName="editions"
+                referencedColumnNames="edition_id"
+                constraintName="fk_matches_editions"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="matches"
+                baseColumnNames="team1_id"
+                referencedTableName="teams"
+                referencedColumnNames="team_id"
+                constraintName="fk_matches_team1"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="matches"
+                baseColumnNames="team2_id"
+                referencedTableName="teams"
+                referencedColumnNames="team_id"
+                constraintName="fk_matches_team2"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-goals-table" author="system">
+        <createTable tableName="goals">
+            <column name="goal_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="goal_type" type="ENUM('default', 'penalty', 'own_goal')" defaultValue="default">
+                <constraints nullable="false"/>
+            </column>
+            <column name="match_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="goals"
+                baseColumnNames="match_id"
+                referencedTableName="matches"
+                referencedColumnNames="match_id"
+                constraintName="fk_goals_matches"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="goals"
+                baseColumnNames="team_id"
+                referencedTableName="teams"
+                referencedColumnNames="team_id"
+                constraintName="fk_goals_teams"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="goals"
+                baseColumnNames="player_id"
+                referencedTableName="players"
+                referencedColumnNames="player_id"
+                constraintName="fk_goals_players"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="001-create-attendance-table" author="system">
+        <createTable tableName="attendance">
+            <column name="attendance_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_first_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_last_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="edition_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="attendance"
+                baseColumnNames="player_id"
+                referencedTableName="players"
+                referencedColumnNames="player_id"
+                constraintName="fk_attendance_players"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="attendance"
+                baseColumnNames="edition_id"
+                referencedTableName="editions"
+                referencedColumnNames="edition_id"
+                constraintName="fk_attendance_editions"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
