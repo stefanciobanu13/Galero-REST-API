@@ -26,9 +26,11 @@ logging:
   level:
     root: INFO
     com.galero: DEBUG
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: INFO
     liquibase: INFO
-
+google:
+  client:
+    id: 353416216408-ndooeo8gs02oqo2b7qc3k3glh6tn2gfe.apps.googleusercontent.com
 springdoc:
   api-docs:
     path: /docs

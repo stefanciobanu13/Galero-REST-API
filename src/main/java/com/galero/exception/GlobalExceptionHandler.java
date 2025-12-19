@@ -45,6 +45,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex,
+            WebRequest request) {
+        String message = ex.getMessage();
+        HttpStatus status = message != null && message.contains("audience") ? 
+                HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST;
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                status == HttpStatus.UNAUTHORIZED ? "UNAUTHORIZED" : "INVALID_REQUEST",
+                message,
+                request.getDescription(false).replace("uri=", "")
+        );
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex,

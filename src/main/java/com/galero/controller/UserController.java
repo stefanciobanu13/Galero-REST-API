@@ -1,6 +1,7 @@
 package com.galero.controller;
 
 import com.galero.dto.UserDTO;
+import com.galero.dto.GoogleCredentialRequest;
 import com.galero.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,12 @@ public class UserController {
     @Operation(summary = "Create a new user")
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDTO));
+    }
+
+    @PostMapping("/google/login")
+    @Operation(summary = "Login or create user with Google OAuth credential")
+    public ResponseEntity<UserDTO> googleLogin(@Valid @RequestBody GoogleCredentialRequest credentialRequest) {
+        return ResponseEntity.ok(userService.loginWithGoogleCredential(credentialRequest.getCredential()));
     }
 
     @PostMapping("/google-login")
@@ -67,5 +74,23 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Integer userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{userId}/assign-player/{playerId}")
+    @Operation(summary = "Assign a player to a user")
+    public ResponseEntity<UserDTO> assignPlayerToUser(@PathVariable Integer userId, @PathVariable Integer playerId) {
+        return ResponseEntity.ok(userService.assignPlayerToUser(userId, playerId));
+    }
+
+    @PostMapping("/{userId}/unassign-player")
+    @Operation(summary = "Unassign player from user")
+    public ResponseEntity<UserDTO> unassignPlayerFromUser(@PathVariable Integer userId) {
+        return ResponseEntity.ok(userService.removePlayerFromUser(userId));
+    }
+
+    @GetMapping("/{userId}/with-player")
+    @Operation(summary = "Get user with their assigned player information")
+    public ResponseEntity<UserDTO> getUserWithPlayer(@PathVariable Integer userId) {
+        return ResponseEntity.ok(userService.getUserWithPlayer(userId));
     }
 }

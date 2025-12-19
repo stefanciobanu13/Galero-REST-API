@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,52 @@ public class UserService {
 
     @Autowired
     private PlayerRepository playerRepository;
+
+    @Autowired
+    private GoogleTokenValidator googleTokenValidator;
+
+    @Transactional
+    public UserDTO loginWithGoogleCredential(String credential) {
+        try {
+            // Validate Google JWT and extract claims
+            Map<String, Object> claims = googleTokenValidator.verifyAndGetClaims(credential);
+
+            String googleId = (String) claims.get("googleId");
+            String email = (String) claims.get("email");
+            String firstName = (String) claims.get("firstName");
+            String lastName = (String) claims.get("lastName");
+            String profilePictureUrl = (String) claims.get("profilePictureUrl");
+
+            // Check if user exists
+            Optional<User> existingUser = userRepository.findByGoogleId(googleId);
+
+            if (existingUser.isPresent()) {
+                // Update existing user with latest info from Google
+                User user = existingUser.get();
+                user.setEmail(email);
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
+                user.setProfilePictureUrl(profilePictureUrl);
+                User updatedUser = userRepository.save(user);
+                return convertToDTO(updatedUser);
+            }
+
+            // Create new user
+            User newUser = new User();
+            newUser.setGoogleId(googleId);
+            newUser.setEmail(email);
+            newUser.setFirstName(firstName);
+            newUser.setLastName(lastName);
+            newUser.setProfilePictureUrl(profilePictureUrl);
+            newUser.setRole(User.UserRole.user);
+
+            User savedUser = userRepository.save(newUser);
+            return convertToDTO(savedUser);
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to authenticate with Google: " + e.getMessage(), e);
+        }
+    }
 
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {
@@ -111,6 +158,36 @@ public class UserService {
             throw new ResourceNotFoundException("User not found with id: " + userId);
         }
         userRepository.deleteById(userId);
+    }
+
+    @Transactional
+    public UserDTO assignPlayerToUser(Integer userId, Integer playerId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Player not found with id: " + playerId));
+
+        user.setPlayer(player);
+        User updatedUser = userRepository.save(user);
+        return convertToDTO(updatedUser);
+    }
+
+    @Transactional
+    public UserDTO removePlayerFromUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        user.setPlayer(null);
+        User updatedUser = userRepository.save(user);
+        return convertToDTO(updatedUser);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDTO getUserWithPlayer(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return convertToDTO(user);
     }
 
     private UserDTO convertToDTO(User user) {
