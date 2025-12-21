@@ -18,7 +18,7 @@ public class Goal {
     private Integer goalId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('default', 'penalty', 'own_goal') DEFAULT 'default'")
+    @Column(nullable = false, columnDefinition = "ENUM('normal', 'penalty', 'own_goal') DEFAULT 'normal'")
     private GoalType goalType;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,19 +37,6 @@ public class Goal {
     private Player player;
 
     public enum GoalType {
-        default_goal("default"), penalty, own_goal;
-
-        private String value;
-
-        GoalType() {
-        }
-
-        GoalType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value != null ? value : this.name();
-        }
+        normal, penalty, own_goal
     }
 }

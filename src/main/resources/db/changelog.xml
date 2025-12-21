@@ -8,5 +8,6 @@
     <!-- Include all migration files -->
     <include file="db/changelog/001-initial-schema.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/002-add-users-table.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/003-change-goal-type-default-to-normal.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

@@ -1,5 +1,6 @@
 package com.galero.dto;
 
+import com.galero.model.Goal.GoalType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class GoalDTO {
     private Integer goalId;
 
-    private String goalType;
+    private GoalType goalType;
 
     @NotNull(message = "Match ID cannot be null")
     private Integer matchId;

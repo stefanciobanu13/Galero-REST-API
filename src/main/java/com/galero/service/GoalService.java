@@ -44,7 +44,7 @@ public class GoalService {
                 .orElseThrow(() -> new ResourceNotFoundException("Player not found with ID: " + goalDTO.getPlayerId()));
         
         Goal goal = new Goal();
-        goal.setGoalType(Goal.GoalType.valueOf(goalDTO.getGoalType()));
+        goal.setGoalType(goalDTO.getGoalType());
         goal.setMatch(match);
         goal.setTeam(team);
         goal.setPlayer(player);
@@ -93,7 +93,7 @@ public class GoalService {
         Goal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Goal not found with ID: " + id));
         
-        goal.setGoalType(Goal.GoalType.valueOf(goalDTO.getGoalType()));
+        goal.setGoalType(goalDTO.getGoalType());
         
         Goal updated = goalRepository.save(goal);
         return convertToDTO(updated);
@@ -108,7 +108,7 @@ public class GoalService {
     private GoalDTO convertToDTO(Goal goal) {
         GoalDTO dto = new GoalDTO();
         dto.setGoalId(goal.getGoalId());
-        dto.setGoalType(goal.getGoalType().name());
+        dto.setGoalType(goal.getGoalType());
         dto.setMatchId(goal.getMatch().getMatchId());
         dto.setTeamId(goal.getTeam().getTeamId());
         dto.setPlayerId(goal.getPlayer().getPlayerId());
