@@ -1,12 +1,24 @@
 package com.galero.repository;
 
+import com.galero.model.Edition;
 import com.galero.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Integer> {
     Optional<Player> findByFirstNameAndLastName(String firstName, String lastName);
+
+    @Query("SELECT DISTINCT e FROM Edition e " +
+            "JOIN Team t ON t.edition.editionId = e.editionId " +
+            "JOIN TeamPlayer tp ON tp.team.teamId = t.teamId " +
+            "WHERE tp.player.playerId = :playerId " +
+            "ORDER BY e.editionNumber DESC")
+    List<Edition> findEditionsWherePlayerParticipated(@Param("playerId") Integer playerId);
 }
+

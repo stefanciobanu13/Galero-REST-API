@@ -1,6 +1,7 @@
 package com.galero.service;
 
 import com.galero.dto.GoalDTO;
+import com.galero.dto.PlayerGoalCountDTO;
 import com.galero.exception.ResourceNotFoundException;
 import com.galero.model.Goal;
 import com.galero.model.Match;
@@ -103,6 +104,20 @@ public class GoalService {
         Goal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Goal not found with ID: " + id));
         goalRepository.delete(goal);
+    }
+
+    @Transactional(readOnly = true)
+    public PlayerGoalCountDTO getPlayerGoalCount(Integer playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Player not found with ID: " + playerId));
+        
+        Long goalCount = goalRepository.countGoalsByPlayerId(playerId);
+        
+        return new PlayerGoalCountDTO(
+                player.getPlayerId(),
+                player.getFirstName(),
+                player.getLastName(),
+                goalCount != null ? goalCount : 0L);
     }
 
     private GoalDTO convertToDTO(Goal goal) {

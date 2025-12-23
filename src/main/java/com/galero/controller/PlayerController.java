@@ -1,8 +1,11 @@
 package com.galero.controller;
 
 import com.galero.dto.PlayerDTO;
+import com.galero.dto.PlayerEditionPlacementDTO;
 import com.galero.service.PlayerService;
+import com.galero.service.PlayerHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ public class PlayerController {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private PlayerHistoryService playerHistoryService;
 
     @PostMapping
     @Operation(summary = "Create a new player")
@@ -61,4 +67,15 @@ public class PlayerController {
         playerService.deletePlayer(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{playerId}/history")
+    @Operation(summary = "Get player's placement history in editions")
+    public ResponseEntity<List<PlayerEditionPlacementDTO>> getPlayerEditionHistory(
+            @PathVariable Integer playerId,
+            @RequestParam(defaultValue = "5")
+            @Parameter(description = "Number of recent editions to retrieve (default: 5)") Integer limit) {
+        List<PlayerEditionPlacementDTO> history = playerHistoryService.getPlayerEditionHistory(playerId, limit);
+        return ResponseEntity.ok(history);
+    }
 }
+

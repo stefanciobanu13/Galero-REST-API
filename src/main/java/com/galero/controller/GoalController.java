@@ -1,6 +1,7 @@
 package com.galero.controller;
 
 import com.galero.dto.GoalDTO;
+import com.galero.dto.PlayerGoalCountDTO;
 import com.galero.service.GoalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,6 +54,13 @@ public class GoalController {
     public ResponseEntity<List<GoalDTO>> getGoalsByPlayer(@PathVariable Integer playerId) {
         List<GoalDTO> goals = goalService.getGoalsByPlayer(playerId);
         return ResponseEntity.ok(goals);
+    }
+
+    @GetMapping("/player/{playerId}/count")
+    @Operation(summary = "Get the total number of goals scored by a player")
+    public ResponseEntity<PlayerGoalCountDTO> getPlayerGoalCount(@PathVariable Integer playerId) {
+        PlayerGoalCountDTO result = goalService.getPlayerGoalCount(playerId);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/type/{goalType}")

@@ -1,6 +1,7 @@
 package com.galero.controller;
 
 import com.galero.dto.EditionDTO;
+import com.galero.dto.EditionFullDetailsDTO;
 import com.galero.service.EditionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +33,13 @@ public class EditionController {
     public ResponseEntity<EditionDTO> getEditionById(@PathVariable Integer id) {
         EditionDTO edition = editionService.getEditionById(id);
         return ResponseEntity.ok(edition);
+    }
+
+    @GetMapping("/{id}/full")
+    @Operation(summary = "Get full edition details including all teams, players, matches, and goals")
+    public ResponseEntity<EditionFullDetailsDTO> getEditionFullDetails(@PathVariable Integer id) {
+        EditionFullDetailsDTO editionDetails = editionService.getEditionFullDetails(id);
+        return ResponseEntity.ok(editionDetails);
     }
 
     @GetMapping("/number/{editionNumber}")
