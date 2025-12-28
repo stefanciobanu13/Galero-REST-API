@@ -1,6 +1,8 @@
 package com.galero.service;
 
 import com.galero.dto.PlayerDTO;
+import com.galero.dto.PlayerEditionWinsDTO;
+import com.galero.dto.PlayerAllTimeScoresDTO;
 import com.galero.exception.ResourceNotFoundException;
 import com.galero.model.Player;
 import com.galero.repository.PlayerRepository;
@@ -63,7 +65,20 @@ public class PlayerService {
         playerRepository.delete(player);
     }
 
+    public List<PlayerEditionWinsDTO> getTopPlayersByEditionWins(Integer limit) {
+        return playerRepository.findTopPlayersByEditionWins().stream()
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    public List<PlayerAllTimeScoresDTO> getTopPlayersByAllTimeScores(Integer limit) {
+        return playerRepository.findTopPlayersByAllTimeScores().stream()
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
     private PlayerDTO convertToDTO(Player player) {
         return new PlayerDTO(player.getPlayerId(), player.getFirstName(), player.getLastName(), player.getGrade());
     }
 }
+

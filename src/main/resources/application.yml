@@ -9,13 +9,13 @@ spring:
       hibernate:
         format_sql: true
   datasource:
-    url: jdbc:mysql://localhost:3306/fotball-db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: hbstudent
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://aws-1-eu-west-1.pooler.supabase.com:5432/postgres?user=postgres.utmaoqhbsezhaxjpjpdp&password=31044050Rsl^
+    username: postgres
+    password: 31044050Rsl^
+    driver-class-name: org.postgresql.Driver
   liquibase:
     change-log: classpath:db/changelog.xml
-    enabled: true
+    enabled: false
 
 server:
   port: 8080
