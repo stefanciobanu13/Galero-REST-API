@@ -29,16 +29,13 @@ public class Attendance {
     @NotNull(message = "Player cannot be null")
     private Player player;
 
-    @Column(nullable = false, length = 50)
-    @NotBlank(message = "Player first name cannot be blank")
-    private String playerFirstName;
-
-    @Column(nullable = false, length = 50)
-    @NotBlank(message = "Player last name cannot be blank")
-    private String playerLastName;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "edition_id", nullable = false)
     @NotNull(message = "Edition cannot be null")
     private Edition edition;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "Status cannot be null")
+    private AttendanceStatus status;
 }

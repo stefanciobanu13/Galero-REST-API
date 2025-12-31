@@ -1,6 +1,6 @@
 package com.galero.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.galero.model.AttendanceStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,12 +20,9 @@ public class AttendanceDTO {
     @NotNull(message = "Player ID cannot be null")
     private Integer playerId;
 
-    @NotBlank(message = "Player first name cannot be blank")
-    private String playerFirstName;
-
-    @NotBlank(message = "Player last name cannot be blank")
-    private String playerLastName;
-
     @NotNull(message = "Edition ID cannot be null")
     private Integer editionId;
+
+    @NotNull(message = "Status cannot be null")
+    private AttendanceStatus status;
 }
