@@ -39,9 +39,8 @@ public class AttendanceService {
         Attendance attendance = new Attendance();
         attendance.setDate(attendanceDTO.getDate());
         attendance.setPlayer(player);
-        attendance.setPlayerFirstName(attendanceDTO.getPlayerFirstName());
-        attendance.setPlayerLastName(attendanceDTO.getPlayerLastName());
         attendance.setEdition(edition);
+        attendance.setStatus(attendanceDTO.getStatus());
         
         Attendance saved = attendanceRepository.save(attendance);
         return convertToDTO(saved);
@@ -61,8 +60,27 @@ public class AttendanceService {
 
     public List<AttendanceDTO> getAttendanceByEdition(Integer editionId) {
         return attendanceRepository.findByEditionEditionId(editionId).stream()
+                .sorted((a1, a2) -> {
+                    // Custom sort order: inscris, rezerva, retras
+                    int statusOrder1 = getStatusOrder(a1.getStatus());
+                    int statusOrder2 = getStatusOrder(a2.getStatus());
+                    return Integer.compare(statusOrder1, statusOrder2);
+                })
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    private int getStatusOrder(com.galero.model.AttendanceStatus status) {
+        switch (status) {
+            case inscris:
+                return 1;
+            case rezerva:
+                return 2;
+            case retras:
+                return 3;
+            default:
+                return 4;
+        }
     }
 
     public List<AttendanceDTO> getAttendanceByDate(LocalDate date) {
@@ -88,8 +106,7 @@ public class AttendanceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance not found with ID: " + id));
         
         attendance.setDate(attendanceDTO.getDate());
-        attendance.setPlayerFirstName(attendanceDTO.getPlayerFirstName());
-        attendance.setPlayerLastName(attendanceDTO.getPlayerLastName());
+        attendance.setStatus(attendanceDTO.getStatus());
         
         Attendance updated = attendanceRepository.save(attendance);
         return convertToDTO(updated);
@@ -106,9 +123,8 @@ public class AttendanceService {
                 attendance.getAttendanceId(),
                 attendance.getDate(),
                 attendance.getPlayer().getPlayerId(),
-                attendance.getPlayerFirstName(),
-                attendance.getPlayerLastName(),
-                attendance.getEdition().getEditionId()
+                attendance.getEdition().getEditionId(),
+                attendance.getStatus()
         );
     }
 }

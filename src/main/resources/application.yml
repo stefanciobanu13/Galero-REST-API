@@ -22,23 +22,17 @@ spring:
     change-log: classpath:db/changelog.xml
     enabled: false
 
-server:
-  port: 8080
-  servlet:
-    context-path: /api/v1
-
 logging:
   level:
     root: INFO
     com.galero: DEBUG
     org.hibernate.SQL: INFO
     liquibase: INFO
+
 google:
   client:
     id: 353416216408-ndooeo8gs02oqo2b7qc3k3glh6tn2gfe.apps.googleusercontent.com
+
 springdoc:
-  api-docs:
-    path: /docs
   swagger-ui:
-    path: /swagger-ui.html
     enabled: true
