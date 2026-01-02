@@ -5,6 +5,7 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
@@ -13,6 +14,10 @@ spring:
     username: postgres
     password: 31044050Rsl^
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 2
+      minimum-idle: 1
+      connection-timeout: 30000
   liquibase:
     change-log: classpath:db/changelog.xml
     enabled: false

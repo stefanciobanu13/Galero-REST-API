@@ -3,6 +3,7 @@ package com.galero.service;
 import com.galero.dto.PlayerDTO;
 import com.galero.dto.PlayerEditionWinsDTO;
 import com.galero.dto.PlayerAllTimeScoresDTO;
+import com.galero.dto.PlayerPlacementStatsDTO;
 import com.galero.exception.ResourceNotFoundException;
 import com.galero.model.Player;
 import com.galero.repository.PlayerRepository;
@@ -75,6 +76,20 @@ public class PlayerService {
         return playerRepository.findTopPlayersByAllTimeScores().stream()
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    public List<PlayerPlacementStatsDTO> getPlayersPlacementStats(Integer limit) {
+        return playerRepository.findPlayersPlacementStats().stream()
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    public PlayerPlacementStatsDTO getPlayerPlacementStats(Integer playerId) {
+        if (!playerRepository.existsById(playerId)) {
+            throw new ResourceNotFoundException("Player not found with ID: " + playerId);
+        }
+        return playerRepository.findPlayerPlacementStats(playerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Placement stats not found for player ID: " + playerId));
     }
 
     private PlayerDTO convertToDTO(Player player) {

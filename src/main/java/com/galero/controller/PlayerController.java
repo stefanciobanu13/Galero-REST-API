@@ -2,6 +2,7 @@ package com.galero.controller;
 
 import com.galero.dto.PlayerDTO;
 import com.galero.dto.PlayerEditionPlacementDTO;
+import com.galero.dto.PlayerPlacementStatsDTO;
 import com.galero.service.PlayerService;
 import com.galero.service.PlayerHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,10 +73,20 @@ public class PlayerController {
     @Operation(summary = "Get player's placement history in editions")
     public ResponseEntity<List<PlayerEditionPlacementDTO>> getPlayerEditionHistory(
             @PathVariable Integer playerId,
-            @RequestParam(defaultValue = "5")
-            @Parameter(description = "Number of recent editions to retrieve (default: 5)") Integer limit) {
-        List<PlayerEditionPlacementDTO> history = playerHistoryService.getPlayerEditionHistory(playerId, limit);
+            @RequestParam(required = false)
+            @Parameter(description = "Number of recent editions to retrieve (optional, returns all if not provided)") Integer limit) {
+        // If limit is not provided, use a very large number to get all results
+        int effectiveLimit = (limit == null) ? Integer.MAX_VALUE : limit;
+        List<PlayerEditionPlacementDTO> history = playerHistoryService.getPlayerEditionHistory(playerId, effectiveLimit);
         return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/{playerId}/placement-stats")
+    @Operation(summary = "Get player's overall placement statistics", 
+               description = "Returns placement counts for a specific player: 1st (won big final), 2nd (lost big final), 3rd (won small final), 4th (lost small final)")
+    public ResponseEntity<PlayerPlacementStatsDTO> getPlayerPlacementStats(@PathVariable Integer playerId) {
+        PlayerPlacementStatsDTO stats = playerService.getPlayerPlacementStats(playerId);
+        return ResponseEntity.ok(stats);
     }
 }
 

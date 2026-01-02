@@ -2,6 +2,7 @@ package com.galero.controller;
 
 import com.galero.dto.PlayerEditionWinsDTO;
 import com.galero.dto.PlayerAllTimeScoresDTO;
+import com.galero.dto.PlayerPlacementStatsDTO;
 import com.galero.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,5 +39,15 @@ public class ChampionsController {
             @RequestParam Integer limit) {
         List<PlayerAllTimeScoresDTO> topScorers = playerService.getTopPlayersByAllTimeScores(limit);
         return ResponseEntity.ok(topScorers);
+    }
+
+    @GetMapping("/placement-stats")
+    @Operation(summary = "Get players placement statistics", 
+               description = "Returns players with their placement counts: 1st (won big final), 2nd (lost big final), 3rd (won small final), 4th (lost small final)")
+    public ResponseEntity<List<PlayerPlacementStatsDTO>> getPlayersPlacementStats(
+            @Parameter(description = "Number of top results to return", required = true)
+            @RequestParam Integer limit) {
+        List<PlayerPlacementStatsDTO> stats = playerService.getPlayersPlacementStats(limit);
+        return ResponseEntity.ok(stats);
     }
 }
